@@ -13,6 +13,8 @@ interface InputProps {
   register: UseFormRegister<FieldValues>
   errors: FieldErrors,
   stackedPosition?: 'left' | 'right'
+  updateValue?: () => void,
+  min?: number
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -27,7 +29,9 @@ export const Input: React.FC<InputProps> = ({
   required,
   register,
   errors,
-  stackedPosition
+  stackedPosition,
+  updateValue,
+  min
 }) => {
 
 
@@ -56,9 +60,10 @@ export const Input: React.FC<InputProps> = ({
           </div>
         }
         <input
+          onKeyUp={updateValue}
           id={id}
           disabled={disabled}
-          {...register(id, { required })}
+          {...register(id, { required})}
           placeholder={placeholder}
           type={type}
           className={`

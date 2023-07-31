@@ -4,7 +4,7 @@ import { AuthLayout } from "../layout/AuthLayout"
 import { Dropdown } from "../../components/Dropdown"
 import { Checkbox } from "../../components/Checkbox"
 import { Button } from "../../components/Button"
-import { Link  } from 'react-router-dom'
+import { Link, useNavigate  } from 'react-router-dom'
 import { PasswordInput } from "../../components/PasswordInput"
 import { useState } from "react"
 import { toast } from 'react-hot-toast';
@@ -16,8 +16,11 @@ export const RegisterPage = () => {
 
   const loginState = useAuthStore((state) => state.loginState)
 
+  const navigate = useNavigate()
 
   const investmentAmount = useAuthStore((state) => state.investmentAmount)
+  const setToken = useAuthStore((state) => state.setToken)
+
 
   const [ isLoading, setIsLoading ] = useState(false)
 
@@ -47,7 +50,8 @@ export const RegisterPage = () => {
       setIsLoading(false)
 
       if(resp.ok) {
-        console.log('registro exitoso')
+        setToken(resp.token)
+        navigate('/verification')
         toast.success('Registro exitoso')
         loginState()
         localStorage.setItem('auth_token', resp.token)

@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import { AuthRoutes } from '../auth/routes/AuthRoutes'
 import { SimulatorRoutes } from '../simulator/routes/SimulatorRoutes'
 import { useAuthStore } from '../store/auth'
+import { VerificationPage } from '../auth/pages/VerificationPage'
 // import { CheckingAuth } from '../ui/components'
 // import { useCheckAuth } from '../hooks'
 // import { SimulatorRoutes } from '../simulator/routes/SimulatorRoutes'
@@ -16,12 +17,10 @@ export const AppRouter = () => {
     <Routes>
 
       <Route path='/*'  element={<SimulatorRoutes />} />
-      <Route path='/verification/:token/:investmentAmount' element={<SimulatorRoutes />} />
-      {
-        authStatus
-        ? <Route path='/*'  element={<SimulatorRoutes />} />
-        :<Route path='auth/*' element={<AuthRoutes />} />
-      }
+      <Route path='/verification' element={<VerificationPage />} />
+      <Route path='/verification/:token/:investmentAmount' element={<VerificationPage />} />
+
+      <Route path='auth/*' element={<AuthRoutes />} />
       
       {/* <Route path='/*' element={<Navigate to="auth/login" />} /> */}
 

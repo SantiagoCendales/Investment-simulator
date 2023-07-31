@@ -7,7 +7,8 @@ interface State {
   investmentAmount: number | null,
   token: string
   loginState: () => void
-  setInvestmentAmount: (investmentAmount: number) => void
+  setInvestmentAmount: (investmentAmount: number) => void,
+  setToken: (token: string) => void
 }
 
 export const useAuthStore = create<State>((set) => ({
@@ -15,6 +16,7 @@ export const useAuthStore = create<State>((set) => ({
   token: token,
   investmentAmount: null,
   loginState: () => set(() => ({ isAuth: true })),
-  setInvestmentAmount: (value) => {({investmentAmount: value})}
+  setInvestmentAmount: (value) => set({investmentAmount: value}),
+  setToken: (token) => set({token})
 }))
 

@@ -29,7 +29,19 @@ const singUp = async({name, lastName, email, password, phone, acceptTermsAndCond
   return response
 }
 
+const verifyAccount = async(token: string | undefined) => {
+  const request = await fetch(`${baseUrl}/api/auth/verify/${token}`, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+  const response = await request.json()
+  return response
+}
+
 export {
   login,
-  singUp
+  singUp,
+  verifyAccount
 }

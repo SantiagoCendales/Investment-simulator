@@ -4,7 +4,7 @@ import { PasswordInput } from "../../components/PasswordInput"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import { Checkbox } from "../../components/Checkbox"
 import { Button } from "../../components/Button"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { login } from '../../services/auth'
 import { useAuthStore } from "../../store/auth"
 import { useState } from "react"
@@ -15,7 +15,10 @@ export const LoginPage = () => {
 
   const [isLoading, setIsLoading] = useState(false)
 
+  const navigate = useNavigate()
+
   const loginState = useAuthStore((state) => state.loginState)
+  const setToken = useAuthStore((state) => state.setToken)
   const {
     register,
     handleSubmit,
@@ -36,6 +39,8 @@ export const LoginPage = () => {
     console.log(data)
     login({email, password}).then((resp) => {
       if(resp.ok) {
+        setToken(resp.token)
+        navigate('/')
         setIsLoading(false)
         toast.success('Bienvenido de nuevo')
         loginState()

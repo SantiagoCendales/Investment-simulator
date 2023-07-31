@@ -16,6 +16,9 @@ import { useAuthStore } from '../../store/auth'
 
 export const Simulator = () => {
 
+  const setInvestmentAmount = useAuthStore((state) => state.setInvestmentAmount)
+  const investmentAmount = useAuthStore((state) => state.investmentAmount)
+
   const navigate = useNavigate()
 
   const token = useAuthStore((state) => state.token)
@@ -32,7 +35,9 @@ export const Simulator = () => {
     handleSubmit,
     formState: {
       errors,
-    }
+    },
+    setValue,
+    getValues
   } = useForm<FieldValues>({
     defaultValues: {
       price: '',
@@ -42,12 +47,20 @@ export const Simulator = () => {
     }
   })
 
+  useEffect(() => {
+    if(investmentAmount) {
+      setValue('price', investmentAmount)
+      updateUnitsByPrice()
+    }
+  }, [investmentAmount])
+  
+
   const onSubmit: SubmitHandler<FieldValues> = (data => {
     setIsLoading(true)
     const {project, price} = data
     getSimulation({investmentValue: price, projectId: project, token: token}).then((resp) => {
+      setInvestmentAmount(price)
       if(resp.ok) {
-        toast.success('Hemos calculado el retorno de tu inversión')
         setSimulationData(resp)
       }
       if(resp.status === 401) {
@@ -66,6 +79,16 @@ export const Simulator = () => {
       }
     })
   }, [])
+
+  const updatePriceByUnits = () => {
+    const units = getValues('units')
+    setValue('price', (units*100000))
+  }
+
+  const updateUnitsByPrice = () => {
+    const price = getValues('price')
+    setValue('units', price/100000)
+  }
   
 
   return (
@@ -93,6 +116,7 @@ export const Simulator = () => {
           <div className="grid grid-cols-4 gap-2">
             <div className="col-span-3">
               <Input
+                updateValue={updateUnitsByPrice}
                 required
                 register={register}
                 errors={errors}
@@ -106,6 +130,7 @@ export const Simulator = () => {
             </div>
             <div className="col-span-1">
               <Input
+                updateValue={updatePriceByUnits}
                 required
                 register={register}
                 errors={errors}
