@@ -23,12 +23,6 @@ ChartJS.register(
 
 const labels = ['2025', '2026', '2027', '2028', '2029', '2030'];
 
-interface BarChartProps {
-  title?: string
-  labels: {label: string, date: string}[],
-  data: {label: string, data: number[]}[]
-}
-
 export const initialData = {
   labels,
   datasets: [
