@@ -5,8 +5,18 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import { Checkbox } from "../../components/Checkbox"
 import { Button } from "../../components/Button"
 import { Link } from "react-router-dom"
+import { login } from '../../services/auth'
+import { useAuthStore } from "../../store/auth"
+import { useState } from "react"
+import { toast } from "react-hot-toast"
+
 
 export const LoginPage = () => {
+
+  const [isLoading, setIsLoading] = useState(false)
+
+  const loginState = useAuthStore((state) => state.loginState)
+  const authState = useAuthStore((state) => state.isAuth)
 
   const {
     register,
@@ -17,36 +27,30 @@ export const LoginPage = () => {
   } = useForm<FieldValues>({
     defaultValues: {
       email: '',
-      password: ''
+      password: '',
+      saveBrowser: false
     }
   })
 
   const onSubmit: SubmitHandler<FieldValues> = (data => {
+    setIsLoading(true)
+    const {email, password} = data
     console.log(data)
-    // setIsLoading(true)
-    // signIn('credentials', {
-    //   ...data,
-    //   redirect: false,
-
-    // })
-    // .then((callback) => {
-    //   setIsLoading(false)
-
-    //   if(callback?.ok) {
-    //     toast.success('Logged in')
-    //     router.refresh()
-    //     loginModal.onClose()
-    //   }
-
-    //   if(callback?.error) {
-    //     toast.error(callback.error)
-    //   }
-    // })
+    login({email, password}).then((resp) => {
+      if(resp.ok) {
+        setIsLoading(false)
+        toast.success('Bienvenido de nuevo')
+        loginState()
+      }
+      if(!resp.ok) {
+        toast.error(resp.msg)
+      }
+    })
   })
 
 
   return (
-    <div className="w-full h-screen flex justify-center items-center">
+    <div className="w-full min-h-screen flex justify-center items-center">
       <AuthLayout
         title='Para simular tu inversión debes iniciar sesión'
         subtitle='Hola de nuevo, un gusto tenerte de vuelta, conoce los nuevos proyectos que tenemos para ti'
@@ -72,7 +76,13 @@ export const LoginPage = () => {
           <a href="" className="underline">Olvidé mi contraseña</a>
         </div>
         <div className="mb-8">
-          <Checkbox label="Guardar en este navegador" />
+          <Checkbox
+            required={false}
+            register={register}
+            errors={errors}
+            id="saveBrowser"
+            label="Guardar en este navegador"
+          />
         </div>
         
         <div className="mb-4">

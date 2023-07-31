@@ -41,7 +41,17 @@ export const Input: React.FC<InputProps> = ({
         ">
         {
           formatPrice &&
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <div
+            className="
+              pointer-events-none
+              absolute
+              inset-y-0
+              left-0
+              flex
+              items-center
+              pl-3
+              z-20
+            ">
             <span className="font-bold sm:text-sm">$</span>
           </div>
         }
@@ -63,6 +73,8 @@ export const Input: React.FC<InputProps> = ({
             placeholder:text-gray-400
             focus:ring-1
             focus:ring-inset
+            focus:relative
+            focus:z-10
             focus:ring-indigo-600
             outline-none
             ${stackedPosition ? stackedPosition === 'left' ? 'rounded-s-md' : 'rounded-e-md ml-[-1px]' : 'rounded-md'}

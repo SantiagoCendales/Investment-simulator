@@ -6,8 +6,20 @@ import { Checkbox } from "../../components/Checkbox"
 import { Button } from "../../components/Button"
 import { Link  } from 'react-router-dom'
 import { PasswordInput } from "../../components/PasswordInput"
+import { useState } from "react"
+import { toast } from 'react-hot-toast';
+import { singUp } from "../../services/auth"
+import { useAuthStore } from "../../store/auth"
+
 
 export const RegisterPage = () => {
+
+  const loginState = useAuthStore((state) => state.loginState)
+
+
+  const investmentAmount = useAuthStore((state) => state.investmentAmount)
+
+  const [ isLoading, setIsLoading ] = useState(false)
 
   const {
     register,
@@ -17,40 +29,37 @@ export const RegisterPage = () => {
     }
   } = useForm<FieldValues>({
     defaultValues: {
-      firstName: '',
+      name: '',
       lastName: '',
       email: '',
       phone: '',
       password: '',
-      refCode: ''
+      referralCode: '',
+      acceptTermsAndConditions: false
     }
   })
 
   const onSubmit: SubmitHandler<FieldValues> = (data => {
     console.log(data)
-    // setIsLoading(true)
-    // signIn('credentials', {
-    //   ...data,
-    //   redirect: false,
+    setIsLoading(true)
+    const {name, lastName, password, phone, referralCode, email, acceptTermsAndConditions} = data
+    singUp({name, lastName, password, phone, referralCode, investmentAmount, email, acceptTermsAndConditions}).then((resp) => {
+      setIsLoading(false)
 
-    // })
-    // .then((callback) => {
-    //   setIsLoading(false)
+      if(resp.ok) {
+        console.log('registro exitoso')
+        toast.success('Registro exitoso')
+        loginState()
+      }
 
-    //   if(callback?.ok) {
-    //     toast.success('Logged in')
-    //     router.refresh()
-    //     loginModal.onClose()
-    //   }
-
-    //   if(callback?.error) {
-    //     toast.error(callback.error)
-    //   }
-    // })
+      if(!resp.ok) {
+        toast.error(resp.msg)
+      }
+    })
   })
 
   return (
-    <div className="w-full h-screen flex justify-center items-center">
+    <div className="w-full min-h-screen flex justify-center items-center">
       <AuthLayout
         title='Para simular tu inversión debes registrarte'
         subtitle='Regístrate a nuestra comunidad de inversionistas'
@@ -59,7 +68,7 @@ export const RegisterPage = () => {
         <div className="grid grid-cols-4 gap-y-3 mb-5">
           <div className="col-span-2">
             <Input
-              id="firstName"
+              id="name"
               type="text"
               placeholder="Nombre"
               register={register}
@@ -117,7 +126,7 @@ export const RegisterPage = () => {
           </div>
           <div className="col-span-4">
             <Input
-              id="refCode"
+              id="referralCode"
               type="text"
               placeholder="Código de referido"
               register={register}
@@ -128,11 +137,17 @@ export const RegisterPage = () => {
         </div>
 
         <div className="mb-8">
-          <Checkbox label="Acepto términos y condiciones" />
+          <Checkbox
+            required
+            id="acceptTermsAndConditions"
+            register={register}
+            errors={errors}
+            label="Acepto términos y condiciones"
+          />
         </div>
 
         <div className="mb-4">
-          <Button onSubmit={handleSubmit(onSubmit)} label="Ingresar"/>
+          <Button onSubmit={handleSubmit(onSubmit)} label="Ingresar" disabled={isLoading}/>
         </div>
 
         <div className="text-center text-sm">
