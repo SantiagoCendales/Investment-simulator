@@ -25,6 +25,8 @@ export const Simulator = () => {
 
   const [projects, setProjects] = useState([])
 
+    const [ simulationData, setSimulationData] = useState();
+
   const {
     register,
     handleSubmit,
@@ -44,9 +46,9 @@ export const Simulator = () => {
     setIsLoading(true)
     const {project, price} = data
     getSimulation({investmentValue: price, projectId: project, token: token}).then((resp) => {
-      console.log(resp)
       if(resp.ok) {
         toast.success('Hemos calculado el retorno de tu inversión')
+        setSimulationData(resp)
       }
       if(resp.status === 401) {
         toast.error('Para poder hacer la simulación debes registrarte o iniciar sesión en la plataforma')
@@ -123,7 +125,8 @@ export const Simulator = () => {
 
         <div className="px-2 text-center mb-4">
           <div className="pr-5">
-            <ChartExample />
+            <ChartExample dataProp={simulationData} />
+
           </div>
           <p className="text-xs text-gray-400">*Proyecciones estimadas, sujetas a cambios.</p>
         </div>
