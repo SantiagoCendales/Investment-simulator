@@ -65,7 +65,6 @@ interface ChartProps {
 
 export const ChartExample: React.FC<ChartProps> = ({dataProp}) => {
 
-  console.log(dataProp)
   const [ data, setData ] = useState(initialData)
 
   useEffect(() => {
