@@ -16,8 +16,6 @@ export const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   const loginState = useAuthStore((state) => state.loginState)
-  const authState = useAuthStore((state) => state.isAuth)
-
   const {
     register,
     handleSubmit,
@@ -41,6 +39,7 @@ export const LoginPage = () => {
         setIsLoading(false)
         toast.success('Bienvenido de nuevo')
         loginState()
+        localStorage.setItem('auth_token', resp.token)
       }
       if(!resp.ok) {
         toast.error(resp.msg)
@@ -86,7 +85,7 @@ export const LoginPage = () => {
         </div>
         
         <div className="mb-4">
-          <Button onSubmit={handleSubmit(onSubmit)} label="Ingresar"/>
+          <Button disabled={isLoading} onSubmit={handleSubmit(onSubmit)} label="Ingresar"/>
         </div>
 
         <div className="text-center text-sm">

@@ -1,6 +1,5 @@
 const baseUrl = import.meta.env.VITE_API_BASE_URL
 import { FieldValues } from 'react-hook-form'
-import { User } from '../types'
 
 const login = async ({email, password}: {email: string, password: string}) => {
   const body = JSON.stringify({email, password})

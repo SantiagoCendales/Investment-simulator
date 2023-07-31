@@ -1,16 +1,24 @@
-import React from 'react'
+import { FieldErrors, FieldValues, UseFormRegister } from 'react-hook-form'
 
-export const TermsAndConditions = () => {
+interface TermsAndConditionsProps {
+  id: string,
+  register: UseFormRegister<FieldValues>
+  required: boolean,
+  errors: FieldErrors
+}
+
+export const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({id, register, required, errors}) => {
   return (
     <div>
       <input
-        id="default-checkbox"
+        id={id}
+        {...register(id, { required })}
         type="checkbox"
         value=""
         className="cursor-pointer relative float-left -ml-[1.5rem] mr-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem] rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none" />
       <label
-        htmlFor="default-checkbox"
-        className="inline-block pl-[0.15rem] hover:cursor-pointer font-medium text-gray-400">
+        htmlFor={id}
+        className={`ml-2 text-sm font-medium text-gray-700 ${errors[id] ? 'text-rose-500' : 'text-zinc-400'}`}>
           Acepto los <a href="" className="text-gray-700 underline">
           términos y condiciones
         </a> de la política de tratamiento de datos

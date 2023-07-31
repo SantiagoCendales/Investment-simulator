@@ -50,6 +50,7 @@ export const RegisterPage = () => {
         console.log('registro exitoso')
         toast.success('Registro exitoso')
         loginState()
+        localStorage.setItem('auth_token', resp.token)
       }
 
       if(!resp.ok) {
@@ -122,7 +123,7 @@ export const RegisterPage = () => {
           />
           </div>
           <div className="col-span-4">
-            <Dropdown />
+            {/* <Dropdown /> */}
           </div>
           <div className="col-span-4">
             <Input

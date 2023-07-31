@@ -7,8 +7,23 @@ import { Heading } from '../../components/Heading'
 import { SimulatorLayout } from '../layout/SimulatorLayout'
 import { Button } from '../../components/Button'
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
+import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { getProject } from '../../services/projects'
+import { getSimulation } from '../../services/simulator'
+import { toast } from 'react-hot-toast'
+import { useAuthStore } from '../../store/auth'
 
 export const Simulator = () => {
+
+  const navigate = useNavigate()
+
+  const token = useAuthStore((state) => state.token)
+  const isAuth = useAuthStore((state) => state.isAuth)
+
+  const [ isloading, setIsLoading ] = useState(false)
+
+  const [projects, setProjects] = useState([])
 
   const {
     register,
@@ -20,31 +35,36 @@ export const Simulator = () => {
     defaultValues: {
       price: '',
       units: '',
+      project: '',
+      termsAndConditions: false
     }
   })
 
   const onSubmit: SubmitHandler<FieldValues> = (data => {
-    console.log(data)
-    // setIsLoading(true)
-    // signIn('credentials', {
-    //   ...data,
-    //   redirect: false,
-
-    // })
-    // .then((callback) => {
-    //   setIsLoading(false)
-
-    //   if(callback?.ok) {
-    //     toast.success('Logged in')
-    //     router.refresh()
-    //     loginModal.onClose()
-    //   }
-
-    //   if(callback?.error) {
-    //     toast.error(callback.error)
-    //   }
-    // })
+    setIsLoading(true)
+    const {project, price} = data
+    getSimulation({investmentValue: price, projectId: project, token: token}).then((resp) => {
+      console.log(resp)
+      if(resp.ok) {
+        toast.success('Hemos calculado el retorno de tu inversión')
+      }
+      if(resp.status === 401) {
+        toast.error('Para poder hacer la simulación debes registrarte o iniciar sesión en la plataforma')
+        navigate('/auth/register')
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
   })
+
+  useEffect(() => {
+    getProject().then((resp) => {
+      if(resp.ok) {
+        setProjects(resp.projects)
+      }
+    })
+  }, [])
+  
 
   return (
     <SimulatorLayout>
@@ -59,12 +79,19 @@ export const Simulator = () => {
 
         <div className="w-4/5 mx-auto mb-8">
           <div className="mb-2">
-            <Dropdown />
+            <Dropdown
+              placeholder='Selecciona el proyecto que quieres invertir'
+              options={projects}
+              id="project"
+              register={register}
+              required
+            />
           </div>
 
           <div className="grid grid-cols-4 gap-2">
             <div className="col-span-3">
               <Input
+                required
                 register={register}
                 errors={errors}
                 placeholder='0.00'
@@ -77,6 +104,7 @@ export const Simulator = () => {
             </div>
             <div className="col-span-1">
               <Input
+                required
                 register={register}
                 errors={errors}
                 bold
@@ -101,36 +129,38 @@ export const Simulator = () => {
         </div>
 
         <div className="flex items-start mb-8 mx-auto w-3/4">
-          <TermsAndConditions />
+          <TermsAndConditions
+            errors={errors}
+            id='termsAndConditions'
+            required
+            register={register}
+          />
         </div>
 
         <div className="w-3/4 mx-auto mb-6">
-          {/* <button
-            className="
-              w-full
-              rounded-full
-              bg-black
-              text-white
-              font-bold
-              px-6
-              py-2
-            ">
-                Calcular inversión
-          </button> */}
-          <Button onSubmit={handleSubmit(onSubmit)} label='Calcular inversión'/>
+          <Button disabled={isloading} onSubmit={handleSubmit(onSubmit)} label='Calcular inversión'/>
         </div>
 
-        <div className="text-center mb-4">
+        {
+          !isAuth 
+          && <div className="text-center mb-4">
           <p className="mb-1 text-gray-500 text-sm">¿Ya tienes cuenta?</p>
           <div className="flex justify-center items-center">
-            <a href="">Iniciar sesión</a>
+            <Link to="/auth">
+              Iniciar sesión
+            </Link>
             <div
               className="border-r h-[15px] mx-4"
               style={{borderColor: '#4743E0'}}
             ></div>
-            <a href="">Crea tu cuenta</a>
+            <Link to="/auth/register">
+              Crea tu cuenta
+            </Link>
           </div>
         </div>
+        }
+
+
 
         <footer className="w-3/5 mx-auto mb-8">
           <Contact />
